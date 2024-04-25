@@ -58,7 +58,7 @@ fun Keypad() {
             Key("7")
             Key("8")
             Key("9")
-            Key("/")a
+            Key("/")
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
