@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,14 +35,18 @@ fun Display() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.Gray),
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .height(200.dp),
         contentAlignment = Alignment.CenterEnd
     ) {
-        Text(
-            text = "0",
-            style = MaterialTheme.typography.displayLarge,
-            modifier = Modifier.padding(16.dp)
-        )
+        Column {
+Text(text = "0+7-2", style = MaterialTheme.typography.displaySmall, modifier = Modifier.padding(16.dp))
+            Text(
+                text = "0",
+                style = MaterialTheme.typography.displayLarge,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
     }
 }
 
@@ -55,43 +61,54 @@ fun Keypad() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Key("7")
-            Key("8")
-            Key("9")
-            Key("/")
+            DigitKey("7")
+            DigitKey("8")
+            DigitKey("9")
+            OperatorKey("/")
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
 
         ) {
-            Key("4")
-            Key("5")
-            Key("6")
-            Key("x")
+            DigitKey("4")
+            DigitKey("5")
+            DigitKey("6")
+            OperatorKey("x")
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
 
         ) {
-            Key("1")
-            Key("2")
-            Key("3")
-            Key("-")
+            DigitKey("1")
+            DigitKey("2")
+            DigitKey("3")
+            OperatorKey("-")
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
 
         ) {
-            Key("C")
-            Key("0")
-            Key("=")
-            Key("+")
+            OperatorKey("C")
+            DigitKey("0")
+            Key("=", color = MaterialTheme.colorScheme.primary)
+            OperatorKey("+")
         }
     }
 
+}
+
+
+@Composable
+fun DigitKey(value: String, color: Color=MaterialTheme.colorScheme.secondaryContainer, modifier: Modifier = Modifier) {
+    Key(value = value, color = color)
+}
+
+@Composable
+fun OperatorKey(value: String, color: Color=MaterialTheme.colorScheme.secondary, modifier: Modifier = Modifier) {
+    Key(value = value, color = color)
 }
 
 @Composable
@@ -103,18 +120,20 @@ fun Key(
 
     Card(
         shape = CircleShape,
-        modifier = modifier
+        colors = CardDefaults.cardColors(color),
+        modifier = Modifier
 //                .fillMaxSize()
             .padding(4.dp)
-            .size(64.dp),
+            .size(72.dp),
     ) {
         Box(
             contentAlignment = Alignment.Center,
+
             modifier = Modifier.fillMaxSize()
         ) {
             Text(
                 text = value,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(16.dp)
             )
         }
