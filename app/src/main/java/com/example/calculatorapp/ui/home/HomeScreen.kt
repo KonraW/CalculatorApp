@@ -12,8 +12,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Backspace
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,7 +62,8 @@ fun Display() {
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
             ) {
 
                 Text(
@@ -66,6 +71,7 @@ fun Display() {
                     style = MaterialTheme.typography.displayLarge,
                     modifier = Modifier.padding(16.dp)
                 )
+                BackspaceButton()
             }
             Row(
                 modifier = Modifier.fillMaxWidth()
@@ -80,6 +86,22 @@ fun Display() {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun BackspaceButton() {
+    IconButton(
+        onClick = { /*TODO*/ },
+        modifier = Modifier.padding(start=8.dp, end=16.dp).size(48.dp)
+    ) {
+
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.Backspace,
+            contentDescription = null,
+            Modifier.size(48.dp),
+            tint = MaterialTheme.colorScheme.secondary
+        )
     }
 }
 

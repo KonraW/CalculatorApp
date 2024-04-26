@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 
 data class HomeUiState(
     val displayText: String = "",
+    val displayResultText: String = "",
     val displayTextHistory: String = "",
     val displayError: String = "",
     val firstDigit: String = "",
@@ -26,40 +27,82 @@ class HomeViewModel() : ViewModel() {
     }
 
     fun onOperatorClicked(operator: String) {
-        homeUiState = if (homeUiState.isOperator) {
-            homeUiState.copy(
-                displayText = homeUiState.displayText + operator
-            )
-        } else {
+        if (homeUiState.isOperator) {
+            if (homeUiState.isSecondDigit) {
+                onEqualsClicked()
+            } else{
+                homeUiState = homeUiState.copy(
+                    displayText = homeUiState.displayText.dropLast(1) + operator
+                )
+            }
+
             onEqualsClicked()
-            homeUiState.copy(
+//            homeUiState.copy(
+//                displayText = homeUiState.displayText + operator
+//            )
+        } else {
+            homeUiState = homeUiState.copy(
                 displayText = homeUiState.displayText + operator,
                 isOperator = true
             )
         }
     }
 
-    fun onEqualsClicked() {
-        val firstDigit = homeUiState.firstDigit.toDouble()
-        val secondDigit = if (homeUiState.isMinusOperator) homeUiState.secondDigit.toDouble()
-            .unaryMinus() else homeUiState.secondDigit.toDouble()
-        val result = when (homeUiState.operator) {
-            "+" -> firstDigit + secondDigit
-            "-" -> firstDigit - secondDigit
-            "*" -> firstDigit * secondDigit
-            "/" -> firstDigit / secondDigit
-            else -> 0
+    fun onMinusOperatorClicked() {
+        if (homeUiState.isOperator) {
+            homeUiState = homeUiState.copy(
+                displayText = homeUiState.displayText + "-",
+                isMinusOperator = true
+            )
+        } else {
+            homeUiState = homeUiState.copy(
+                displayText = homeUiState.displayText + "-",
+                isOperator = true
+            )
         }
+    }
 
-        homeUiState = homeUiState.copy(
-            displayTextHistory = homeUiState.displayText,
-            displayText = result.toString(),
-        )
+
+
+    fun onEqualsClicked() {
+        if (validateEquals()) {
+
+            val firstDigit = homeUiState.firstDigit.toDouble()
+            val secondDigit = if (homeUiState.isMinusOperator) homeUiState.secondDigit.toDouble()
+                .unaryMinus() else homeUiState.secondDigit.toDouble()
+            val result = when (homeUiState.operator) {
+                "+" -> firstDigit + secondDigit
+                "-" -> firstDigit - secondDigit
+                "*" -> firstDigit * secondDigit
+                "/" -> firstDigit / secondDigit
+                else -> 0
+            }
+
+            homeUiState = homeUiState.copy(
+                displayTextHistory = homeUiState.displayText,
+                displayText = result.toString(),
+            )
+        } else {
+            homeUiState = homeUiState.copy(
+                displayError = "Invalid operation"
+            )
+        }
+    }
+
+    private fun validateEquals(): Boolean {
+        if (homeUiState.isFirstDigit && homeUiState.isSecondDigit && homeUiState.isOperator) {
+            return true
+        }
+        return false
     }
 
     fun onClearClicked() {
         homeUiState = homeUiState.copy(
-            displayText = ""
+            displayText = "",
+            displayTextHistory = "",
+            firstDigit = "",
+            secondDigit = "",
+            operator = "",
         )
     }
 
