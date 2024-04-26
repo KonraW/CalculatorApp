@@ -41,7 +41,7 @@ fun Display() {
     ) {
         Column {
             Text(
-                text = "0+7-2",
+                text = "0+7-2+3",
                 style = MaterialTheme.typography.displaySmall,
                 modifier = Modifier.padding(16.dp)
             )
