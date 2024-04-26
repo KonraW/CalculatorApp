@@ -137,25 +137,23 @@ fun Keypad() {
 @Composable
 fun DigitKey(
     value: String,
-    color: Color = MaterialTheme.colorScheme.secondaryContainer,
     modifier: Modifier = Modifier
 ) {
-    Key(value = value, color = color)
+    Key(value = value, color = MaterialTheme.colorScheme.secondaryContainer)
 }
 
 @Composable
 fun OperatorKey(
     value: String,
-    color: Color = MaterialTheme.colorScheme.secondary,
     modifier: Modifier = Modifier
 ) {
-    Key(value = value, color = color)
+    Key(value = value, color = MaterialTheme.colorScheme.secondary)
 }
 
 @Composable
 fun Key(
     value: String,
-    color: Color = MaterialTheme.colorScheme.secondary,
+    color: Color,
     modifier: Modifier = Modifier
 ) {
 
@@ -163,7 +161,6 @@ fun Key(
         shape = CircleShape,
         colors = CardDefaults.cardColors(color),
         modifier = Modifier
-//                .fillMaxSize()
             .padding(4.dp)
             .size(72.dp),
     ) {
@@ -175,7 +172,6 @@ fun Key(
             Text(
                 text = value,
                 style = MaterialTheme.typography.titleLarge,
-//                modifier = Modifier.padding(16.dp)
             )
         }
     }
