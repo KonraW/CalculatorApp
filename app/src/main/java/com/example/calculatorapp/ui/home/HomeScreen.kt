@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,7 +25,9 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun HomeScreen() {
-    Column {
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
         Display()
         Keypad()
     }
@@ -34,22 +37,48 @@ fun HomeScreen() {
 fun Display() {
     Box(
         modifier = Modifier
+            .fillMaxHeight(0.3f)
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.primaryContainer)
             .height(200.dp),
         contentAlignment = Alignment.CenterEnd
     ) {
         Column {
-            Text(
-                text = "0+7-2+3",
-                style = MaterialTheme.typography.displaySmall,
-                modifier = Modifier.padding(16.dp)
-            )
-            Text(
-                text = "0",
-                style = MaterialTheme.typography.displayLarge,
-                modifier = Modifier.padding(16.dp)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+
+                Text(
+                    text = "0+7-2+3",
+                    color = MaterialTheme.colorScheme.secondary,
+                    style = MaterialTheme.typography.displaySmall,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+
+                Text(
+                    text = "0",
+                    style = MaterialTheme.typography.displayLarge,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(24.dp)
+                        .padding(8.dp),
+                    colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondary),
+                ) {
+                }
+            }
         }
     }
 }
@@ -146,7 +175,7 @@ fun Key(
             Text(
                 text = value,
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(16.dp)
+//                modifier = Modifier.padding(16.dp)
             )
         }
     }
