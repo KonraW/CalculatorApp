@@ -49,8 +49,7 @@ fun Display() {
     ) {
         Column {
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End
             ) {
 
                 Text(
@@ -65,11 +64,24 @@ fun Display() {
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
+//                NegateButton()
                 Text(
                     text = "0",
+                    color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.displayLarge,
                     modifier = Modifier.padding(16.dp)
+                )
+                Text(
+                    text = "+",
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    style = MaterialTheme.typography.displayLarge,
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+                Text(
+                    text = "0",
+                    color = MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.displayLarge,
+                    modifier = Modifier.padding(end = 16.dp)
                 )
                 BackspaceButton()
             }
@@ -82,8 +94,7 @@ fun Display() {
                         .height(24.dp)
                         .padding(8.dp),
                     colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondary),
-                ) {
-                }
+                ) {}
             }
         }
     }
@@ -92,8 +103,7 @@ fun Display() {
 @Composable
 fun BackspaceButton() {
     IconButton(
-        onClick = { /*TODO*/ },
-        modifier = Modifier.padding(start=8.dp, end=16.dp).size(48.dp)
+        onClick = { /*TODO*/ }, modifier = Modifier.size(72.dp)
     ) {
 
         Icon(
@@ -106,6 +116,21 @@ fun BackspaceButton() {
 }
 
 @Composable
+fun NegateButton() {
+    IconButton(
+        onClick = { /*TODO*/ }, modifier = Modifier
+            .padding(start = 8.dp, end = 16.dp)
+            .size(48.dp)
+    ) {
+        Text(
+            text = "+/-",
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.secondary
+        )
+    }
+}
+
+@Composable
 fun Keypad() {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -113,43 +138,49 @@ fun Keypad() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Key(value = "+/-", color = MaterialTheme.colorScheme.primary)
+            Key(value = "+/-", color = MaterialTheme.colorScheme.tertiary)
+            OperatorKey("C")
+            OperatorKey("/")
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
+
         ) {
             DigitKey("7")
             DigitKey("8")
             DigitKey("9")
-            OperatorKey("/")
+            OperatorKey("x")
         }
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
 
         ) {
             DigitKey("4")
             DigitKey("5")
             DigitKey("6")
-            OperatorKey("x")
+            OperatorKey("-")
         }
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
 
         ) {
             DigitKey("1")
             DigitKey("2")
             DigitKey("3")
-            OperatorKey("-")
+            OperatorKey("+")
         }
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            OperatorKey("C")
+
+            DigitKey("00")
             DigitKey("0")
+            DigitKey(value = ",")
             Key("=", color = MaterialTheme.colorScheme.primary)
-            OperatorKey("+")
+
         }
     }
 
@@ -158,25 +189,21 @@ fun Keypad() {
 
 @Composable
 fun DigitKey(
-    value: String,
-    modifier: Modifier = Modifier
+    value: String, modifier: Modifier = Modifier
 ) {
     Key(value = value, color = MaterialTheme.colorScheme.secondaryContainer)
 }
 
 @Composable
 fun OperatorKey(
-    value: String,
-    modifier: Modifier = Modifier
+    value: String, modifier: Modifier = Modifier
 ) {
     Key(value = value, color = MaterialTheme.colorScheme.secondary)
 }
 
 @Composable
 fun Key(
-    value: String,
-    color: Color,
-    modifier: Modifier = Modifier
+    value: String, color: Color, modifier: Modifier = Modifier
 ) {
 
     Card(
