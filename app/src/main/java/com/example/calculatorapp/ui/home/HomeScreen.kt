@@ -40,7 +40,11 @@ fun Display() {
         contentAlignment = Alignment.CenterEnd
     ) {
         Column {
-Text(text = "0+7-2", style = MaterialTheme.typography.displaySmall, modifier = Modifier.padding(16.dp))
+            Text(
+                text = "0+7-2",
+                style = MaterialTheme.typography.displaySmall,
+                modifier = Modifier.padding(16.dp)
+            )
             Text(
                 text = "0",
                 style = MaterialTheme.typography.displayLarge,
@@ -102,12 +106,20 @@ fun Keypad() {
 
 
 @Composable
-fun DigitKey(value: String, color: Color=MaterialTheme.colorScheme.secondaryContainer, modifier: Modifier = Modifier) {
+fun DigitKey(
+    value: String,
+    color: Color = MaterialTheme.colorScheme.secondaryContainer,
+    modifier: Modifier = Modifier
+) {
     Key(value = value, color = color)
 }
 
 @Composable
-fun OperatorKey(value: String, color: Color=MaterialTheme.colorScheme.secondary, modifier: Modifier = Modifier) {
+fun OperatorKey(
+    value: String,
+    color: Color = MaterialTheme.colorScheme.secondary,
+    modifier: Modifier = Modifier
+) {
     Key(value = value, color = color)
 }
 
