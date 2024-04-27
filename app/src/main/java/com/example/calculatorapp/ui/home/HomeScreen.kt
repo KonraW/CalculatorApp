@@ -27,28 +27,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.calculatorapp.ui.AppViewModelProvider
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = viewModel(factory= AppViewModelProvider.Factory)//, key = HomeViewModel::class.java.name)
+    viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory)//, key = HomeViewModel::class.java.name)
 ) {
     val homeUiState = viewModel.homeUiState
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        Display(homeUiState = homeUiState)
-        Keypad(homeUiState = homeUiState)
+        Display(viewModel, homeUiState = homeUiState)
+        Keypad(viewModel, homeUiState = homeUiState)
     }
 }
 
 @Composable
 fun Display(
-    homeUiState: HomeUiState,
-    modifier: Modifier = Modifier
+    viewModel: HomeViewModel, homeUiState: HomeUiState, modifier: Modifier = Modifier
 ) {
     Box(
         modifier = Modifier
@@ -94,7 +92,7 @@ fun Display(
                     style = MaterialTheme.typography.displayLarge,
                     modifier = Modifier.padding(end = 16.dp)
                 )
-                BackspaceButton()
+                BackspaceButton(viewModel = viewModel)
             }
             Row(
                 modifier = Modifier.fillMaxWidth()
@@ -112,9 +110,11 @@ fun Display(
 }
 
 @Composable
-fun BackspaceButton() {
+fun BackspaceButton(
+    viewModel: HomeViewModel, modifier: Modifier = Modifier
+) {
     IconButton(
-        onClick = { /*TODO*/ }, modifier = Modifier.size(72.dp)
+        onClick = { viewModel.onBackspaceClicked() }, modifier = Modifier.size(72.dp)
     ) {
 
         Icon(
@@ -126,25 +126,24 @@ fun BackspaceButton() {
     }
 }
 
-@Composable
-fun NegateButton() {
-    IconButton(
-        onClick = { /*TODO*/ }, modifier = Modifier
-            .padding(start = 8.dp, end = 16.dp)
-            .size(48.dp)
-    ) {
-        Text(
-            text = "+/-",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.secondary
-        )
-    }
-}
+//@Composable
+//fun NegateButton() {
+//    IconButton(
+//        onClick = { /*TODO*/ }, modifier = Modifier
+//            .padding(start = 8.dp, end = 16.dp)
+//            .size(48.dp)
+//    ) {
+//        Text(
+//            text = "+/-",
+//            style = MaterialTheme.typography.titleLarge,
+//            color = MaterialTheme.colorScheme.secondary
+//        )
+//    }
+//}
 
 @Composable
 fun Keypad(
-    homeUiState: HomeUiState,
-    modifier: Modifier = Modifier
+    viewModel: HomeViewModel, homeUiState: HomeUiState, modifier: Modifier = Modifier
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -154,9 +153,15 @@ fun Keypad(
         Row(
             modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Key(value = "+/-", color = MaterialTheme.colorScheme.primary)
-            Key(value = "+/-", color = MaterialTheme.colorScheme.tertiary)
-            OperatorKey("C")
+            Key(value = "+/-",
+                color = MaterialTheme.colorScheme.primary,
+                onClick = { viewModel.onFirstNegateClicked() })
+            Key(value = "+/-",
+                color = MaterialTheme.colorScheme.tertiary,
+                onClick = { viewModel.onSecondNegateClicked() })
+            Key("C",
+                color = MaterialTheme.colorScheme.secondary,
+                onClick = { viewModel.onClearClicked() })
             OperatorKey("/")
         }
         Row(
@@ -166,7 +171,7 @@ fun Keypad(
             DigitKey("7")
             DigitKey("8")
             DigitKey("9")
-            OperatorKey("x")
+            OperatorKey("*")
         }
         Row(
             modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
@@ -192,9 +197,10 @@ fun Keypad(
 
             DigitKey("00")
             DigitKey("0")
-            DigitKey(value = ".")
-            Key("=", color = MaterialTheme.colorScheme.primary)
-
+            Key(value = ".", color = MaterialTheme.colorScheme.secondary, onClick = { viewModel.onDotClicked() })
+            Key("=",
+                color = MaterialTheme.colorScheme.primary,
+                onClick = { viewModel.onEqualsClicked() })
         }
     }
 
@@ -203,7 +209,9 @@ fun Keypad(
 
 @Composable
 fun DigitKey(
-    value: String, viewModel: HomeViewModel = viewModel(factory= AppViewModelProvider.Factory), modifier: Modifier = Modifier
+    value: String,
+    viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    modifier: Modifier = Modifier
 ) {
     Key(
         value = value,
@@ -214,14 +222,19 @@ fun DigitKey(
 
 @Composable
 fun OperatorKey(
-    value: String, modifier: Modifier = Modifier
+    value: String,
+    viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    modifier: Modifier = Modifier
 ) {
-    Key(value = value, color = MaterialTheme.colorScheme.secondary)
+    Key(
+        value = value,
+        color = MaterialTheme.colorScheme.secondary,
+        onClick = { viewModel.onOperatorClicked(value) })
 }
 
 @Composable
 fun Key(
-    value: String, color: Color, onClick: () -> Unit = {}, modifier: Modifier = Modifier
+    value: String, color: Color, onClick: () -> Unit, modifier: Modifier = Modifier
 ) {
 
     Card(
