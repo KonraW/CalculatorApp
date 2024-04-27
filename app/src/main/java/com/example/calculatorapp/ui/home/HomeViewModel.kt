@@ -1,10 +1,14 @@
 package com.example.calculatorapp.ui.home
 
+import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 
 data class HomeUiState(
 //    val displayText: String = "",
-    val displayTextResult: String = "",
+//    val displayTextResult: String = "",
     val displayTextHistory: String = "",
     val displayError: String = "",
     val lastEntered: LastEntered = LastEntered.FIRST_DIGIT,
@@ -26,10 +30,14 @@ enum class LastEntered {
 
 
 class HomeViewModel() : ViewModel() {
-    var homeUiState = HomeUiState()
+    var homeUiState by mutableStateOf(HomeUiState())
         private set
 
+
+
+
     fun onDigitClicked(digit: String) {
+        Log.d("HomeViewModel", "onDigitClicked: $digit")
         if (homeUiState.isOperator) {
             homeUiState = homeUiState.copy(
                 secondDigit = homeUiState.secondDigit + digit,
@@ -64,7 +72,7 @@ class HomeViewModel() : ViewModel() {
         }
     }
 
-//    fun onMinusOperatorClicked() {
+    //    fun onMinusOperatorClicked() {
 //        if (homeUiState.isOperator) {
 //            homeUiState = homeUiState.copy(
 //                displayText = homeUiState.displayText + "-",
@@ -78,39 +86,59 @@ class HomeViewModel() : ViewModel() {
 //        }
 //    }
     fun onFirstMinusClicked() {
-        homeUiState = homeUiState.copy(
-            isFirstMinus = true
-        )
+        if (homeUiState.isFirstDigit) {
+            if (homeUiState.isFirstMinus) {
+                homeUiState = homeUiState.copy(
+                    isFirstMinus = false,
+                    firstDigit = homeUiState.firstDigit.substring(1)
+                )
+            } else {
+                homeUiState = homeUiState.copy(
+                    isFirstMinus = true,
+                    firstDigit = "-${homeUiState.firstDigit}"
+                )
+            }
+        }
     }
 
     fun onSecondMinusClicked() {
-        homeUiState = homeUiState.copy(
-            isSecondMinus = true
-        )
-    }
-
-    fun resultDisplay() {
-        var result = ""
         if (homeUiState.isSecondDigit) {
-            result = homeUiState.secondDigit
+            if (homeUiState.isSecondMinus) {
+                homeUiState = homeUiState.copy(
+                    isSecondMinus = false,
+                    secondDigit = homeUiState.secondDigit.substring(1)
+                )
+            } else {
+                homeUiState = homeUiState.copy(
+                    isSecondMinus = true,
+                    secondDigit = "-${homeUiState.secondDigit}"
+                )
+            }
         }
-        if (homeUiState.isSecondMinus) {
-            result = " -$result"
-        }
-        if (homeUiState.isOperator) {
-            result = " " + homeUiState.operator + result
-        }
-        if (homeUiState.isFirstDigit) {
-            result = homeUiState.firstDigit + result
-        }
-        if (homeUiState.isFirstMinus) {
-            result = " -$result"
-        }
-
-        homeUiState = homeUiState.copy(
-            displayTextResult = result
-        )
     }
+
+//    fun resultDisplay() {
+//        var result = ""
+//        if (homeUiState.isSecondDigit) {
+//            result = homeUiState.secondDigit
+//        }
+//        if (homeUiState.isSecondMinus) {
+//            result = " -$result"
+//        }
+//        if (homeUiState.isOperator) {
+//            result = " " + homeUiState.operator + result
+//        }
+//        if (homeUiState.isFirstDigit) {
+//            result = homeUiState.firstDigit + result
+//        }
+//        if (homeUiState.isFirstMinus) {
+//            result = " -$result"
+//        }
+//
+//        homeUiState = homeUiState.copy(
+//            displayTextResult = result
+//        )
+//    }
 
     fun onEqualsClicked() {
         if (validateEquals()) {
@@ -128,7 +156,7 @@ class HomeViewModel() : ViewModel() {
             }
 
             homeUiState = homeUiState.copy(
-                displayTextHistory = homeUiState.displayTextResult,
+                displayTextHistory = homeUiState.firstDigit + homeUiState.operator + homeUiState.secondDigit + "=" + result.toString(),
                 firstDigit = result.toString(),
             )
         } else {
@@ -144,7 +172,7 @@ class HomeViewModel() : ViewModel() {
 
     fun onClearClicked() {
         homeUiState = homeUiState.copy(
-            displayTextResult = "",
+//            displayTextResult = "",
             displayTextHistory = "",
             firstDigit = "",
             secondDigit = "",
