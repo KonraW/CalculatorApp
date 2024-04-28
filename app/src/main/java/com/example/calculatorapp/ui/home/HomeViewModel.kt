@@ -221,7 +221,7 @@ class HomeViewModel() : ViewModel() {
                     isFirstDot = true,
                 )
             }
-            var bigDecimalResult = result.toDouble()
+//            var bigDecimalResult = result.toDouble()
 
             if (isInfinite(result.toDouble())) {
                 homeUiState = homeUiState.copy(
@@ -238,13 +238,12 @@ class HomeViewModel() : ViewModel() {
 
             homeUiState = homeUiState.copy(
                 displayTextHistory = homeUiState.firstDigit + homeUiState.operator + homeUiState.secondDigit + "=" + result.toString(),
-                firstDigit = roundDoubleToTwoDecimalPlaces(result.toDouble()).toString(),
+                firstDigit = result.toString(),
                 secondDigit = "",
                 operator = "",
                 isOperator = false,
                 isSecondDigit = false,
                 isSecondMinus = false,
-                isFirstMinus = false,
                 isFirstDigit = true,
                 lastEntered = LastEntered.FIRST_DIGIT,
                 isSecondDot = false,
@@ -256,9 +255,6 @@ class HomeViewModel() : ViewModel() {
         }
     }
 
-    fun roundDoubleToTwoDecimalPlaces(value: Double): Double {
-        return (value * 100.0).roundToLong() / 100.0
-    }
 
 
     fun isInfinite(value: Double): Boolean {
