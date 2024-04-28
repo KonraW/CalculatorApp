@@ -5,6 +5,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import java.math.BigDecimal
+import java.math.MathContext
+import kotlin.math.roundToLong
 
 data class HomeUiState(
 //    val displayText: String = "",
@@ -82,10 +85,10 @@ class HomeViewModel() : ViewModel() {
     fun onDigitClicked(digit: String) {
         Log.d("HomeViewModel", "onDigitClicked: $digit")
         if (homeUiState.isOperator) {
-            if (digit == "00" && (homeUiState.secondDigit.isEmpty() || homeUiState.secondDigit == "0")) {
+            if (digit == "00" && (homeUiState.secondDigit.isEmpty() || homeUiState.secondDigit == "0" || homeUiState.secondDigit == "-")) {
                 return
             }
-            if (digit == "0" && homeUiState.secondDigit == "0") {
+            if (digit == "0" && (homeUiState.secondDigit == "0" || homeUiState.secondDigit == "-")) {
                 return
             }
 
@@ -95,10 +98,10 @@ class HomeViewModel() : ViewModel() {
                 lastEntered = LastEntered.SECOND_DIGIT
             )
         } else {
-            if (digit == "00" && (homeUiState.firstDigit.isEmpty() || homeUiState.firstDigit == "0")) {
+            if (digit == "00" && (homeUiState.firstDigit.isEmpty() || homeUiState.firstDigit == "0" || homeUiState.firstDigit == "-")) {
                 return
             }
-            if (digit == "0" && homeUiState.firstDigit == "0") {
+            if (digit == "0" && (homeUiState.firstDigit == "0" || homeUiState.firstDigit == "-")) {
                 return
             }
             homeUiState = homeUiState.copy(
@@ -117,11 +120,11 @@ class HomeViewModel() : ViewModel() {
     }
 
     fun onDotClicked() {
-        if (homeUiState.lastEntered == LastEntered.OPERATOR || homeUiState.secondDigit == "-") {
+        if (homeUiState.lastEntered == LastEntered.OPERATOR || homeUiState.secondDigit == "-" && !homeUiState.isSecondDot) {
             homeUiState = homeUiState.copy(
-                firstDigit = "0.",
-                isFirstDigit = true,
-                isFirstDot = true
+                secondDigit = homeUiState.secondDigit + "0.",
+                isSecondDigit = true,
+                isSecondDot = true
             )
         } else if (homeUiState.lastEntered == LastEntered.SECOND_DIGIT && !homeUiState.isSecondDot) {
             homeUiState = homeUiState.copy(
@@ -129,9 +132,9 @@ class HomeViewModel() : ViewModel() {
                 isSecondDigit = true,
                 isSecondDot = true
             )
-        } else if (homeUiState.lastEntered == LastEntered.FIRST_DIGIT && !homeUiState.isFirstDot && !homeUiState.isFirstDigit) {
+        } else if (homeUiState.lastEntered == LastEntered.FIRST_DIGIT && (!homeUiState.isFirstDigit || homeUiState.firstDigit == "-") && !homeUiState.isFirstDot) {
             homeUiState = homeUiState.copy(
-                firstDigit = "0.",
+                firstDigit = homeUiState.firstDigit + "0.",
                 isFirstDigit = true,
                 isFirstDot = true
             )
@@ -251,7 +254,7 @@ class HomeViewModel() : ViewModel() {
 //    }
 
     fun onEqualsClicked() {
-        if (homeUiState.secondDigit == "0" && homeUiState.operator == "/") {
+        if ((homeUiState.secondDigit.toDouble().compareTo(0)==0) && homeUiState.operator == "/") {
             homeUiState = homeUiState.copy(
                 displayError = "Cannot divide by zero"
             )
@@ -265,19 +268,20 @@ class HomeViewModel() : ViewModel() {
                 "+" -> firstDigit + secondDigit
                 "-" -> firstDigit - secondDigit
                 "*" -> firstDigit * secondDigit
-                "/" -> firstDigit / secondDigit
-                else -> 0
+                "/" -> firstDigit.divide(secondDigit, MathContext.DECIMAL128) //firstDigit / secondDigit
+                else -> BigDecimal(0)
             }
-            if (isIntegerWithZeroFraction(result.toDouble())) {
-                result = result.toInt()
-                homeUiState = homeUiState.copy(
-                    isFirstDot = false,
-                )
-            } else {
-                homeUiState = homeUiState.copy(
-                    isFirstDot = true,
-                )
-            }
+            result= result.stripTrailingZeros()
+//            if (isIntegerWithZeroFraction(result.toDouble())) {
+//                result = result2.toInt()
+//                homeUiState = homeUiState.copy(
+//                    isFirstDot = false,
+//                )
+//            } else {
+//                homeUiState = homeUiState.copy(
+//                    isFirstDot = true,
+//                )
+//            }
 //            var bigDecimalResult = result.toDouble()
 
             if (isInfinite(result.toDouble())) {
@@ -294,7 +298,7 @@ class HomeViewModel() : ViewModel() {
             }
 
             homeUiState = homeUiState.copy(
-                displayTextHistory = homeUiState.firstDigit + " " + homeUiState.operator + " " + homeUiState.secondDigit + "=" + result.toString(),
+                displayTextHistory = homeUiState.firstDigit + " " + homeUiState.operator + " " + homeUiState.secondDigit + " = " + result.toString(),
                 firstDigit = result.toString(),
                 secondDigit = "",
                 operator = "",
