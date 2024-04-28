@@ -5,7 +5,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import kotlin.math.roundToLong
 
 data class HomeUiState(
 //    val displayText: String = "",
@@ -32,7 +31,7 @@ enum class LastEntered {
 
 class HomeViewModel() : ViewModel() {
     var homeUiState by mutableStateOf(HomeUiState())
-        private set
+//        private set
 
 
     fun onBackspaceClicked() {
@@ -40,6 +39,10 @@ class HomeViewModel() : ViewModel() {
             if (homeUiState.secondDigit.last() == '.') {
                 homeUiState = homeUiState.copy(
                     isSecondDot = false
+                )
+            } else if (homeUiState.firstDigit.last() == '-') {
+                homeUiState = homeUiState.copy(
+                    isSecondMinus = false
                 )
             }
             homeUiState = homeUiState.copy(
@@ -59,6 +62,10 @@ class HomeViewModel() : ViewModel() {
                 homeUiState = homeUiState.copy(
                     isFirstDot = false
                 )
+            } else if (homeUiState.firstDigit.last() == '-') {
+                homeUiState = homeUiState.copy(
+                    isFirstMinus = false
+                )
             }
             homeUiState = homeUiState.copy(
                 firstDigit = homeUiState.firstDigit.dropLast(1)
@@ -68,41 +75,81 @@ class HomeViewModel() : ViewModel() {
                     isFirstDigit = false,
                 )
             }
-        } else {
-            homeUiState = homeUiState.copy(
-                displayError = "Nothing to delete"
-            )
         }
+        deleteError()
     }
 
     fun onDigitClicked(digit: String) {
         Log.d("HomeViewModel", "onDigitClicked: $digit")
         if (homeUiState.isOperator) {
+            if (digit == "00" && (homeUiState.secondDigit.isEmpty() || homeUiState.secondDigit == "0")) {
+                return
+            }
+            if (digit == "0" && homeUiState.secondDigit == "0") {
+                return
+            }
+
             homeUiState = homeUiState.copy(
-                secondDigit = homeUiState.secondDigit + digit, isSecondDigit = true
+                secondDigit = homeUiState.secondDigit + digit,
+                isSecondDigit = true,
+                lastEntered = LastEntered.SECOND_DIGIT
             )
         } else {
+            if (digit == "00" && (homeUiState.firstDigit.isEmpty() || homeUiState.firstDigit == "0")) {
+                return
+            }
+            if (digit == "0" && homeUiState.firstDigit == "0") {
+                return
+            }
             homeUiState = homeUiState.copy(
-                firstDigit = homeUiState.firstDigit + digit, isFirstDigit = true
+                firstDigit = homeUiState.firstDigit + digit,
+                isFirstDigit = true,
+                lastEntered = LastEntered.FIRST_DIGIT
             )
         }
+        deleteError()
+    }
+
+    fun deleteError() {
+        homeUiState = homeUiState.copy(
+            displayError = ""
+        )
     }
 
     fun onDotClicked() {
-        if (homeUiState.isOperator && !homeUiState.isSecondDot) {
+        if (homeUiState.lastEntered == LastEntered.OPERATOR || homeUiState.secondDigit == "-") {
+            homeUiState = homeUiState.copy(
+                firstDigit = "0.",
+                isFirstDigit = true,
+                isFirstDot = true
+            )
+        } else if (homeUiState.lastEntered == LastEntered.SECOND_DIGIT && !homeUiState.isSecondDot) {
             homeUiState = homeUiState.copy(
                 secondDigit = homeUiState.secondDigit + ".",
                 isSecondDigit = true,
                 isSecondDot = true
             )
-        } else if (homeUiState.isFirstDigit && !homeUiState.isFirstDot) {
+        } else if (homeUiState.lastEntered == LastEntered.FIRST_DIGIT && !homeUiState.isFirstDot && !homeUiState.isFirstDigit) {
+            homeUiState = homeUiState.copy(
+                firstDigit = "0.",
+                isFirstDigit = true,
+                isFirstDot = true
+            )
+        } else if (homeUiState.lastEntered == LastEntered.FIRST_DIGIT && !homeUiState.isFirstDot && homeUiState.isFirstDigit) {
             homeUiState = homeUiState.copy(
                 firstDigit = homeUiState.firstDigit + ".", isFirstDigit = true, isFirstDot = true
             )
         }
+        deleteError()
     }
 
     fun onOperatorClicked(operator: String) {
+        if (homeUiState.firstDigit.isEmpty() || homeUiState.firstDigit == "-") {
+            homeUiState = homeUiState.copy(
+                displayError = "Enter a number first"
+            )
+            return
+        }
         if (homeUiState.isOperator) {
             if (homeUiState.lastEntered == LastEntered.OPERATOR) {
                 homeUiState = homeUiState.copy(
@@ -115,15 +162,17 @@ class HomeViewModel() : ViewModel() {
                     isOperator = true
                 )
             }
-        } else {
+        } else if (homeUiState.isFirstDigit) {
             homeUiState = homeUiState.copy(
                 operator = operator, isOperator = true
             )
+        } else {
+            return
         }
         homeUiState = homeUiState.copy(
-            lastEntered = LastEntered.OPERATOR,
-            displayError = ""
+            lastEntered = LastEntered.OPERATOR
         )
+        deleteError()
     }
 
     //    fun onMinusOperatorClicked() {
@@ -156,6 +205,7 @@ class HomeViewModel() : ViewModel() {
                 )
             }
         }
+        deleteError()
     }
 
     fun onSecondNegateClicked() {
@@ -174,6 +224,7 @@ class HomeViewModel() : ViewModel() {
                 )
             }
         }
+        deleteError()
     }
 
 //    fun resultDisplay() {
@@ -200,6 +251,12 @@ class HomeViewModel() : ViewModel() {
 //    }
 
     fun onEqualsClicked() {
+        if (homeUiState.secondDigit == "0" && homeUiState.operator == "/") {
+            homeUiState = homeUiState.copy(
+                displayError = "Cannot divide by zero"
+            )
+            return
+        }
         if (validateEquals()) {
 
             val firstDigit = homeUiState.firstDigit.toDouble().toBigDecimal()
@@ -237,7 +294,7 @@ class HomeViewModel() : ViewModel() {
             }
 
             homeUiState = homeUiState.copy(
-                displayTextHistory = homeUiState.firstDigit + homeUiState.operator + homeUiState.secondDigit + "=" + result.toString(),
+                displayTextHistory = homeUiState.firstDigit + " " + homeUiState.operator + " " + homeUiState.secondDigit + "=" + result.toString(),
                 firstDigit = result.toString(),
                 secondDigit = "",
                 operator = "",
@@ -252,9 +309,10 @@ class HomeViewModel() : ViewModel() {
             homeUiState = homeUiState.copy(
                 displayError = "Invalid operation"
             )
+            return
         }
+        deleteError()
     }
-
 
 
     fun isInfinite(value: Double): Boolean {
@@ -266,7 +324,7 @@ class HomeViewModel() : ViewModel() {
     }
 
     private fun validateEquals(): Boolean {
-        return homeUiState.isFirstDigit && homeUiState.isSecondDigit && homeUiState.isOperator
+        return homeUiState.isFirstDigit && homeUiState.isSecondDigit && homeUiState.isOperator && homeUiState.firstDigit != "-" && homeUiState.secondDigit != "-"
     }
 
     fun onClearClicked() {

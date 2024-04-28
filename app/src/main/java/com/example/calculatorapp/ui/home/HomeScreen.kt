@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.calculatorapp.ui.AppViewModelProvider
 
@@ -74,25 +75,46 @@ fun Display(
                 verticalAlignment = Alignment.CenterVertically
             ) {
 //                NegateButton()
+                val fontSize =
+                    (32 - homeUiState.firstDigit.length - homeUiState.secondDigit.length - homeUiState.operator.length).coerceIn(
+                        12,
+                        24
+                    ).sp
                 Text(
                     text = homeUiState.firstDigit,
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.displayLarge,
+                    maxLines = 1,
+                    fontSize = fontSize,
                     modifier = Modifier.padding(16.dp)
                 )
                 Text(
                     text = homeUiState.operator,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = MaterialTheme.typography.displayLarge,
+                    maxLines = 1,
+                    fontSize = fontSize,
                     modifier = Modifier.padding(end = 16.dp)
                 )
                 Text(
                     text = homeUiState.secondDigit,
                     color = MaterialTheme.colorScheme.tertiary,
                     style = MaterialTheme.typography.displayLarge,
+                    maxLines = 1,
+                    fontSize = fontSize,
                     modifier = Modifier.padding(end = 16.dp)
                 )
                 BackspaceButton(viewModel = viewModel)
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End
+            ) {
+                Text(
+                    text = homeUiState.displayError,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(end = 16.dp)
+                )
             }
             Row(
                 modifier = Modifier.fillMaxWidth()
@@ -197,7 +219,10 @@ fun Keypad(
 
             DigitKey("00")
             DigitKey("0")
-            Key(value = ".", color = MaterialTheme.colorScheme.secondary, onClick = { viewModel.onDotClicked() })
+            Key(
+                value = ".",
+                color = MaterialTheme.colorScheme.secondary,
+                onClick = { viewModel.onDotClicked() })
             Key("=",
                 color = MaterialTheme.colorScheme.primary,
                 onClick = { viewModel.onEqualsClicked() })
@@ -262,5 +287,16 @@ fun Key(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen()
+    HomeScreen(
+        viewModel = HomeViewModel().apply {
+            // Tutaj możesz ustawić przykładowe liczby
+            homeUiState = HomeUiState(
+                firstDigit = "579",
+                operator = "+",
+                secondDigit = "432",
+                displayError = "Error",
+                displayTextHistory = "123 + 456 = 579"
+            )
+        }
+    )
 }
